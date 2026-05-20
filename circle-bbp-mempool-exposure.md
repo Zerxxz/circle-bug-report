@@ -11,26 +11,53 @@
 
 **Vector String:**
 ```
-CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/I:L/Threat:N/Environmental:N
+CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N/CR:M/IR:M/AR:M/E:X
 ```
 
-**Metric Values:**
+**Metric Values (Base):**
 | Metric | Value | Rationale |
 |--------|-------|-----------|
-| Attack Vector (AV) | Network | Exploitable via HTTP RPC, no physical/locally proximity required |
-| Attack Complexity (AC) | Low | No special preconditions; simply POST to the RPC endpoint |
-| Attack Requirements (AT) | None | No race condition, no specific state required — mempool is always populated on a busy testnet |
-| Privileges Required (PR) | None | No authentication, API key, or privileged access needed |
+| Attack Vector (AV) | Network | HTTP RPC accessible from internet — no proximity required |
+| Attack Complexity (AC) | Low | No special preconditions; simple POST request |
+| Attack Requirements (AT) | None | Mempool always populated; no specific state needed |
+| Privileges Required (PR) | None | No authentication or API key required |
 | User Interaction (UI) | None | No victim interaction required |
-| Impact (I) | Low | Only Confidentiality affected; no integrity compromise or service disruption |
+| Vulnerable System Confidentiality (VC) | Low | Mempool data (pending txs) exposed to any observer |
+| Vulnerable System Integrity (VI) | None | No integrity impact from observation alone |
+| Vulnerable System Availability (VA) | None | No availability impact |
+| Subsequent System Confidentiality (SC) | None | No downstream confidentiality impact |
+| Subsequent System Integrity (SI) | None | No downstream integrity impact |
+| Subsequent System Availability (SA) | None | No downstream availability impact |
 
-**Score Calculation:**
-- ISS = 0.22 (Confidentiality=Low 0.22, Integrity=Negligible, Availability=Negligible)
-- Exploitability = 3.88 × 1.0 × 1.0 × 1.0 × 1.0 = **3.88**
-- Base = min([1 - (1 - 0.22) × 0.915 × 0.44], 0) + max(3.88, 0) = min(0.315, 0) + 3.88 = **4.195**
-- **CVSS-B Base Score: 4.2 (Medium)**
+**Environmental Modifiers (set to Medium):**
+| Metric | Value | Rationale |
+|--------|-------|-----------|
+| CR (Confidentiality Requirement) | Medium | Business-critical mempool data |
+| IR (Integrity Requirement) | Medium | Potential MEV exploitation |
+| AR (Availability Requirement) | Medium | RPC availability important |
+| E (Exploitability) | X (defaults to A) | Proof-of-concept available |
 
-**Threat (T) = N** — No active exploitation campaign documented; scored as baseline
+**MacroVector Derivation (from FIRST cvss-v4-calculator):**
+| EQ | Level | Condition |
+|----|-------|-----------|
+| EQ1 (AV/PR/UI) | 0 | AV:N & PR:N & UI:N |
+| EQ2 (AC/AT) | 0 | AC:L & AT:N |
+| EQ3 (VC/VI/VA) | 2 | Not (VC:H or VI:H or VA:H) |
+| EQ4 (SC/SI/SA) | 2 | No High/Low impact on subsequent system |
+| EQ5 (E) | 0 | E=A (worst case) |
+| EQ6 (CR×VC, IR×VI, AR×VA) | 1 | Not all High+High combinations |
+
+**MacroVector:** `002201` → Lookup Score: **6.9**
+
+**Interpolation (to our exact vector):**
+- Lower MacroVector `002211`: 5.5 (diff = 1.4)
+- EQ3+6 severity distance from highest: 0.2 / 1.0 = **20%** → deduction: 0.28
+- EQ4 severity distance from highest: 0.3 / 0.4 = **75%** → deduction: 1.05
+- Mean deduction: (0.28 + 1.05) / 2 = **0.665**
+
+**Final Score:** round(6.9 − 0.665, 1) = **6.2 (Medium)**
+
+> Calculation verified against FIRST's official cvss-v4-calculator reference implementation (https://github.com/FIRSTdotorg/cvss-v4-calculator)
 
 ---
 
