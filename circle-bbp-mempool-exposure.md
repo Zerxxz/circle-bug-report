@@ -108,6 +108,42 @@ This endpoint returns:
 3. Attacker front-runs or sandwiches the victim's transaction by submitting a higher-gas transaction with the same nonce
 4. Alternatively, attacker extracts sensitive business logic from transaction input data
 
+---
+
+### Impact
+
+The `txpool_content` endpoint exposes all pending and queued transactions to any unauthenticated external party. This creates a direct path to **economic exploitation** and **privacy violation**.
+
+**1. MEV / Front-Running Exploitation**
+
+An attacker observes the mempool for high-value transactions (e.g., DEX swaps, token transfers, governance actions). By identifying the target transaction's sender and nonce, the attacker submits a competing transaction with a higher gas price using the same nonce — forcing their transaction to be executed first. On a public blockchain, this enables:
+- **Front-running** — Buy the same token pair before the victim, sell immediately after
+- **Sandwich attacks** — Place a buy order before and a sell order after the victim's transaction
+- **NFT sniping** — Mint a limited NFT before the victim when their mint transaction is observed in the mempool
+
+This is not theoretical — tools like Flashbots Protect exist because mempool exposure is the root enabler for MEV-based financial extraction.
+
+**2. Transaction Content Leakage**
+
+The full transaction payload is exposed:
+- Sender/recipient addresses → transaction graph mapping
+- Transaction value → identifying high-value wallets
+- Nonce → enabling targeted replacement attacks
+- Input data (function selector + arguments) → exposing smart contract call patterns, internal business logic, protocol interactions
+
+This data enables:
+- **Targeted phishing** — Correlating wallet addresses with real-world identities via on-chain behavior patterns
+- **Business intelligence theft** — Mapping competitor transaction strategies in real-time
+- **Pre-attack reconnaissance** — Identifying which protocols and contracts a target interacts with before launching social engineering or smart contract attacks
+
+**3. Privacy Breach**
+
+Users submitting transactions to these endpoints have no indication their pending transaction is visible to third parties. This fundamentally violates the expected confidentiality of blockchain transactions — users assume their pending transactions are private until confirmed on-chain.
+
+**4. Severity Note**
+
+While this finding does not enable direct on-chain fund theft (mempool access is read-only), it creates the **critical pre-condition** for MEV-based financial extraction and represents a clear information security breach. The Arc testnet RPC endpoints are explicitly listed as in-scope bounty-eligible assets, making this a direct finding against Circle's security posture.
+
 ### Real Impact Observed
 
 On `rpc.blockdaemon.testnet.arc.network`:
