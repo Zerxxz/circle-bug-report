@@ -7,6 +7,31 @@
 ### Severity
 **Medium** — Mempool Information Disclosure
 
+#### CVSS 4.0 Calculation
+
+**Vector String:**
+```
+CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/I:L/Threat:N/Environmental:N
+```
+
+**Metric Values:**
+| Metric | Value | Rationale |
+|--------|-------|-----------|
+| Attack Vector (AV) | Network | Exploitable via HTTP RPC, no physical/locally proximity required |
+| Attack Complexity (AC) | Low | No special preconditions; simply POST to the RPC endpoint |
+| Attack Requirements (AT) | None | No race condition, no specific state required — mempool is always populated on a busy testnet |
+| Privileges Required (PR) | None | No authentication, API key, or privileged access needed |
+| User Interaction (UI) | None | No victim interaction required |
+| Impact (I) | Low | Only Confidentiality affected; no integrity compromise or service disruption |
+
+**Score Calculation:**
+- ISS = 0.22 (Confidentiality=Low 0.22, Integrity=Negligible, Availability=Negligible)
+- Exploitability = 3.88 × 1.0 × 1.0 × 1.0 × 1.0 = **3.88**
+- Base = min([1 - (1 - 0.22) × 0.915 × 0.44], 0) + max(3.88, 0) = min(0.315, 0) + 3.88 = **4.195**
+- **CVSS-B Base Score: 4.2 (Medium)**
+
+**Threat (T) = N** — No active exploitation campaign documented; scored as baseline
+
 ---
 
 ### Asset (In-Scope)
