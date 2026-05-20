@@ -15,6 +15,21 @@
 
 ---
 
+### CWE Classification
+
+**Primary:** `CWE-284` — Improper Access Control - Generic
+
+**Secondary:** 
+- `CWE-552` — Files or Directories Accessible to External Parties
+- `CWE-306` — Missing Authentication for Critical Function
+- `CWE-200` — Information Disclosure
+
+**Related CAPEC:**
+- `CAPEC-116` — Excavation
+- `CAPEC-169` — Footprinting
+
+---
+
 ### Impact In-Scope Category
 **Open Redirect / Information Disclosure** — Exposure of pending transactions that should remain private until confirmed on-chain.
 
